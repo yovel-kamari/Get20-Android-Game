@@ -50,6 +50,11 @@ public class Cell implements ICell {
     public void draw(Canvas canvas) {
         int index = value - 1;
 
+        // Safety check: value 0 represents an empty cell.
+        if (value <= 0) {
+            return;
+        }
+
         // If the cell is selected, use the "selected" image
         if (picked) {
             index += images.length / 2;
