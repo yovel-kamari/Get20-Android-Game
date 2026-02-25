@@ -445,5 +445,6 @@ public class Board {
     public boolean isExpansionTriggered() {return expansionTriggered;}
 
     public void resetExpansionFlag() {expansionTriggered = false;}
+    public int getMaxTileCurrentGame() {return maxValueOnBoard;}
 
 }
