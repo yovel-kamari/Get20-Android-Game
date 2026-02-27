@@ -1,34 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
+    android:background="@drawable/background_main"
     android:padding="24dp">
 
+    <!-- Transparent board overlay -->
+    <ImageView
+        android:id="@+id/boardOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="80dp"
+        android:alpha="0.06"
+        android:scaleType="centerCrop"
+        android:src="@drawable/background" />
+
+    <!-- Logo -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/background_get20" />
+
+    <!-- One line subtitle -->
     <TextView
-        android:id="@+id/highScoreText"
+        android:id="@+id/subtitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="22sp"
+        android:layout_below="@id/logo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="MERGE THE TILES UNTIL YOU REACH 20"
+        android:textColor="#E0E0E0"
+        android:textSize="16sp"
         android:textStyle="bold"
-        android:text="High Score: 0"/>
+        android:letterSpacing="0.05"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:gravity="center" />
 
-    <TextView
-        android:id="@+id/maxTileText"
-        android:layout_width="wrap_content"
+    <!-- Stats Card -->
+    <LinearLayout
+        android:id="@+id/statsCard"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
-        android:layout_marginTop="8dp"
-        android:text="Max Tile: 0"/>
+        android:layout_below="@id/subtitle"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/stats_card">
 
+        <TextView
+            android:id="@+id/txtHighScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HIGH SCORE  894"
+            android:textColor="#FFD700"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtMaxTile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="MAX TILE  12"
+            android:textColor="#CCCCCC"
+            android:textSize="18sp"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Neon Play Button -->
     <Button
         android:id="@+id/playButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Play"
-        android:layout_marginTop="32dp"/>
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="60dp"
+        android:background="@drawable/btn_neon"
+        android:text="PLAY"
+        android:textAllCaps="true"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:elevation="16dp" />
 
-</LinearLayout>
+</RelativeLayout>

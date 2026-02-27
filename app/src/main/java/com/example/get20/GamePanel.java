@@ -3,6 +3,11 @@ package com.example.get20;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
+import android.graphics.Paint;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
+import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -13,6 +18,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private Board board;
 
     private GameActivity activity;
+    private final float refreshRate;
+    private final Paint hudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public GamePanel(Context context, GameActivity activity, Bitmap[] images) {
         super(context);
@@ -23,14 +30,26 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         // Register this GamePanel instance as a SurfaceHolder callback listener
         getHolder().addCallback(this);
 
+        float rr = 60f;
+        if (getDisplay() != null) {
+            rr = getDisplay().getRefreshRate();
+        }
+        refreshRate = rr;
         // Create the game loop thread
-        thread = new MainThread(getHolder(), this);
+        thread = new MainThread(getHolder(), this, refreshRate);
 
         board = new Board(
                 context.getResources().getDisplayMetrics().widthPixels,
                 context.getResources().getDisplayMetrics().heightPixels,
                 images
         );
+        getHolder().setFormat(android.graphics.PixelFormat.TRANSPARENT);
+        setZOrderOnTop(true);
+
+        hudPaint.setColor(0xFF2B2B2B);
+        hudPaint.setTextSize(64f);
+        hudPaint.setTypeface(Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD));
+        hudPaint.setTextAlign(Paint.Align.CENTER);
 
         setFocusable(true); // Enable touch input
     }
@@ -83,7 +102,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         return super.onTouchEvent(event);
     }
 
-    public void update() {
+    public void update(float dt) {
 
         // If game ended -> notify activity and stop loop
         if (board.isGameOver()) {
@@ -97,9 +116,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             return;
         }
 
-        board.update();
+        board.update(dt);
         activity.updateScore(board.getScore());
-
+        android.util.Log.d("GET20", "Expansion detected. New size=" + board.getBoardSize());
         if (board.isExpansionTriggered()) {
             activity.onBoardExpanded(board.getBoardSize());
             board.resetExpansionFlag();
@@ -110,9 +129,16 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        if (canvas != null) {
-            board.draw(canvas);
-        }
+        if (canvas == null) return;
+
+        // Cream white background
+        canvas.drawColor(0xFFFAF6ED);
+
+        board.draw(canvas);
+
+        // Draw score centered at the top
+        String text = "" + board.getScore();
+        canvas.drawText(text, getWidth() / 2f, 120f, hudPaint);
     }
 
     // Pause game loop when activity is paused
@@ -123,7 +149,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     // Resume game loop when activity resumes
     public void resumeGame() {
         if (!thread.isAlive()) {
-            thread = new MainThread(getHolder(), this);
+            thread = new MainThread(getHolder(), this, refreshRate);
             thread.setRunning(true);
             thread.start();
         }

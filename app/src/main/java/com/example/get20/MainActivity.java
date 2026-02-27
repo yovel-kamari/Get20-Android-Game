@@ -2,6 +2,8 @@ package com.example.get20;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -19,23 +21,28 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Initialize persistent storage handler
+        // Initialize repository
         repository = new GameRepository(this);
 
-        // Initialize persistent storage handler
-        highScoreText = findViewById(R.id.highScoreText);
-        maxTileText = findViewById(R.id.maxTileText);
+        // Find views
+        highScoreText = findViewById(R.id.txtHighScore);
+        maxTileText = findViewById(R.id.txtMaxTile);
         Button playButton = findViewById(R.id.playButton);
 
+        // Start pulse animation
+        Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse);
+        playButton.startAnimation(pulse);
+
+        // Update UI with saved stats
         updateStatsDisplay();
 
-        // Reads stored values and updates the UI
+        // Start game on click
         playButton.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, GameActivity.class);
             startActivity(intent);
         });
-
     }
+
     // Reads stored values and updates the UI
     private void updateStatsDisplay() {
         int highScore = repository.getHighScore();

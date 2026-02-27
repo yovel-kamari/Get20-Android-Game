@@ -34,16 +34,40 @@ public class GameActivity extends AppCompatActivity {
 
         // Current score display only
         scoreText = new TextView(this);
-        scoreText.setTextSize(24);
-        scoreText.setPadding(40, 40, 40, 40);
+
         scoreText.setText("Score: 0");
+        scoreText.setTextSize(30);
+        scoreText.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+
+// Force visible text color (not theme-dependent)
+        scoreText.setTextColor(0xFF111111);
+
+// Center text
+        scoreText.setTextAlignment(TextView.TEXT_ALIGNMENT_CENTER);
+
+// Make it look like a HUD card
+        android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+        bg.setColor(0xFFFFFFFF);          // solid white card
+        bg.setCornerRadius(28f);          // rounded corners
+        scoreText.setBackground(bg);
+
+// Padding inside the card
+        scoreText.setPadding(48, 26, 48, 26);
+
+// Position top-center
+        FrameLayout.LayoutParams scoreParams = new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT
+        );
+        scoreParams.gravity = android.view.Gravity.TOP | android.view.Gravity.CENTER_HORIZONTAL;
+        scoreParams.topMargin = 24;       // pushes it below status bar a bit
+        scoreText.setLayoutParams(scoreParams);
 
         // Create GamePanel (View + Game Engine bridge)
         gamePanel = new GamePanel(this, this, images);
 
         // Add views (GamePanel background, then score overlay)
         layout.addView(gamePanel);
-        layout.addView(scoreText);
 
         setContentView(layout);
     }
@@ -51,14 +75,18 @@ public class GameActivity extends AppCompatActivity {
     // Load all number images (normal + selected)
     private void loadImages() {
 
+        // Array contains:
+        // index 0-19  -> normal tiles (1..20)
+        // index 20-39 -> selected tiles (1a..20a)
         images = new Bitmap[40];
 
-        // Estimate tile size (safe approximation before board is created)
-        int targetSize = getResources().getDisplayMetrics().widthPixels / 5;
-
         BitmapFactory.Options options = new BitmapFactory.Options();
+
+        // Prevent automatic scaling based on screen density
         options.inScaled = false;
-        options.inPreferredConfig = Bitmap.Config.RGB_565; // Uses half the memory of ARGB_8888
+
+        // Use RGB_565 to reduce memory usage (no alpha channel needed)
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
 
         for (int i = 1; i <= 20; i++) {
 
@@ -87,26 +115,29 @@ public class GameActivity extends AppCompatActivity {
                 throw new RuntimeException("Failed to decode bitmap for tile " + i);
             }
 
-            // Scale bitmaps to tile size
-            images[i - 1] = Bitmap.createScaledBitmap(normal, targetSize, targetSize, true);
-            images[i - 1 + 20] = Bitmap.createScaledBitmap(selected, targetSize, targetSize, true);
-
-            // Free original full-size bitmaps
-            normal.recycle();
-            selected.recycle();
+            // Store original bitmaps without scaling.
+            // Scaling will be handled dynamically inside Cell.draw()
+            images[i - 1] = normal;
+            images[i - 1 + 20] = selected;
         }
     }
 
     // Called from GamePanel when board expands
     public void onBoardExpanded(int newSize) {
 
-        runOnUiThread(() ->
-                Toast.makeText(
-                        this,
-                        "Board expanded to " + newSize + "x" + newSize,
-                        Toast.LENGTH_SHORT
-                ).show()
-        );
+        runOnUiThread(() -> {
+
+            Toast toast = Toast.makeText(
+                    this,
+                    "Board expanded to " + newSize + "x" + newSize,
+                    Toast.LENGTH_SHORT
+            );
+
+            // Force toast to appear in the center of the screen
+            toast.setGravity(android.view.Gravity.CENTER, 0, 0);
+
+            toast.show();
+        });
     }
 
     // Called when game ends (Score + Max Tile of current game)

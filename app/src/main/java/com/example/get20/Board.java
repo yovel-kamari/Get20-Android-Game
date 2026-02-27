@@ -69,15 +69,25 @@ public class Board {
     }
 
     private void calculateLayout() {
-        int margin = 40;
-        int topSpace = 150;
 
-        int boardArea = Math.min(screenWidth, screenHeight - topSpace) - 2 * margin;
+        int margin = 40;
+
+        // Use 95% of the smallest screen dimension
+        int usableWidth = (int)(screenWidth * 0.95f);
+        int usableHeight = (int)(screenHeight * 0.75f);
+
+        int boardArea = Math.min(usableWidth, usableHeight);
 
         cellSize = boardArea / boardSize;
 
-        startX = (screenWidth - (boardSize * cellSize)) / 2;
-        startY = topSpace + margin;
+        int boardWidth = boardSize * cellSize;
+        int boardHeight = boardSize * cellSize;
+
+        // Center horizontally
+        startX = (screenWidth - boardWidth) / 2;
+
+        // Center vertically
+        startY = (screenHeight - boardHeight) / 2;
     }
 
     private void createEmptyBoard() {
@@ -98,9 +108,19 @@ public class Board {
         }
     }
 
-    // Returns random value between 1 and maxValueOnBoard
     private int getRandomValue() {
-        return random.nextInt(maxValueOnBoard) + 1;
+
+        // Weighted random generation:
+        // 70% chance -> 1
+        // 20% chance -> 2
+        // 10% chance -> 3
+        // Encourages strategic long-term merges instead of fast high-tile spawning.
+
+        int r = random.nextInt(100); // 0-99
+
+        if (r < 70) return 1;
+        if (r < 90) return 2;
+        return 3;
     }
 
     // Handle the new value created after a merge
@@ -150,8 +170,9 @@ public class Board {
                 int y = startY + i * cellSize;
 
                 int value;
-                if (i < oldSize && j < oldSize) {
-                    value = oldBoard[i][j].getValue();
+                // Shift old board down by 1 row so new row appears at the top
+                if (i > 0 && i <= oldSize && j < oldSize) {
+                    value = oldBoard[i - 1][j].getValue();
                 } else {
                     value = getRandomValue();
                 }
@@ -200,15 +221,23 @@ public class Board {
         selectGroup(row, col);
     }
 
-    private int[] findCellByTouch(float x, float y) {
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-                if (board[i][j].isInside(x, y)) {
-                    return new int[]{i, j};
-                }
-            }
+    private int[] findCellByTouch(float touchX, float touchY) {
+        // Convert global screen coordinates to board-local coordinates
+        float localX = touchX - startX;
+        float localY = touchY - startY;
+
+        float boardPixelSize = boardSize * cellSize;
+
+        // Bounding-box check
+        if (localX < 0 || localY < 0 ||
+                localX >= boardPixelSize || localY >= boardPixelSize) {
+            return null;
         }
-        return null;
+        // Convert pixel position to grid indices
+        int col = (int)(localX / cellSize);
+        int row = (int)(localY / cellSize);
+
+        return new int[]{row, col};
     }
 
     private void selectGroup(int row, int col) {
@@ -321,6 +350,8 @@ public class Board {
         // Main cell gets the new value
         board[selectedRow][selectedCol].setValue(newValue);
 
+        board[selectedRow][selectedCol].startPop();
+
         // All other cells in group become empty
         for (int[] cellPosition : selectedGroup) {
 
@@ -418,10 +449,10 @@ public class Board {
         }
     }
 
-    public void update() {
+    public void update(float dt) {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                board[i][j].update();
+                board[i][j].update(dt);
             }
         }
     }
@@ -447,4 +478,9 @@ public class Board {
     public void resetExpansionFlag() {expansionTriggered = false;}
     public int getMaxTileCurrentGame() {return maxValueOnBoard;}
 
+    public int getStartX() {return startX;}
+
+    public int getStartY() {return startY;}
+
+    public int getCellSize() {return cellSize;}
 }

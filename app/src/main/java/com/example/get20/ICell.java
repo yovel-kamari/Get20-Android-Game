@@ -5,7 +5,7 @@ import android.graphics.Canvas;
 public interface ICell {
 
     // Update cell state (animations, effects)
-    void update();
+    void update(float dt);
 
     // Draw the cell on the screen
     void draw(Canvas canvas);

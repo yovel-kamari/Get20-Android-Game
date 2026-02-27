@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Deep blue gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="900"
+                android:centerX="0.5"
+                android:centerY="0.4"
+                android:startColor="#0F2A44"
+                android:endColor="#050A12" />
+        </shape>
+    </item>
+
+    <!-- Vignette effect -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:type="radial"
+                android:gradientRadius="1200"
+                android:centerX="0.5"
+                android:centerY="0.5"
+                android:startColor="#00000000"
+                android:endColor="#CC000000" />
+        </shape>
+    </item>
+
+</layer-list>
