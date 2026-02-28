@@ -19,6 +19,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private GameActivity activity;
     private final float refreshRate;
+    private int lastScore = -1;
     private final Paint hudPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public GamePanel(Context context, GameActivity activity, Bitmap[] images) {
@@ -117,14 +118,20 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         board.update(dt);
-        activity.updateScore(board.getScore());
-        android.util.Log.d("GET20", "Expansion detected. New size=" + board.getBoardSize());
+
+        // Update score ONLY if changed
+        int currentScore = board.getScore();
+        if (currentScore != lastScore) {
+            activity.updateScore(currentScore);
+            lastScore = currentScore;
+        }
+
         if (board.isExpansionTriggered()) {
             activity.onBoardExpanded(board.getBoardSize());
             board.resetExpansionFlag();
         }
     }
-
+    
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);

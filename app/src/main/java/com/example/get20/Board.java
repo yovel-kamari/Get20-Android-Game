@@ -21,7 +21,9 @@ public class Board {
     private boolean reached10;
     private boolean reached15;
 
-    private Bitmap[] images;
+    private Bitmap[] images;        // original images (256x256)
+    private Bitmap[] scaledImages;  // scaled once to cellSize
+
     private Random random;
 
     private int startX;
@@ -57,13 +59,13 @@ public class Board {
         this.gameOver = false;
         this.expansionTriggered = false;
 
-
         initBoard();
     }
 
     // Initializes the board with random values
     private void initBoard() {
         calculateLayout();
+        scaleImagesOnce();   // scale bitmaps once according to cellSize
         createEmptyBoard();
         fillBoardRandom();
     }
@@ -90,6 +92,20 @@ public class Board {
         startY = (screenHeight - boardHeight) / 2;
     }
 
+    // Scale all images once to match current cellSize
+    private void scaleImagesOnce() {
+        scaledImages = new Bitmap[images.length];
+
+        for (int i = 0; i < images.length; i++) {
+            scaledImages[i] = Bitmap.createScaledBitmap(
+                    images[i],
+                    cellSize,
+                    cellSize,
+                    true
+            );
+        }
+    }
+
     private void createEmptyBoard() {
         board = new Cell[boardSize][boardSize];
     }
@@ -103,24 +119,13 @@ public class Board {
                 int x = startX + j * cellSize;
                 int y = startY + i * cellSize;
 
-                board[i][j] = new Cell(value, x, y, cellSize, images);
+                board[i][j] = new Cell(value, x, y, cellSize, scaledImages);
             }
         }
     }
 
     private int getRandomValue() {
-
-        // Weighted random generation:
-        // 70% chance -> 1
-        // 20% chance -> 2
-        // 10% chance -> 3
-        // Encourages strategic long-term merges instead of fast high-tile spawning.
-
-        int r = random.nextInt(100); // 0-99
-
-        if (r < 70) return 1;
-        if (r < 90) return 2;
-        return 3;
+        return random.nextInt(3) + 1;
     }
 
     // Handle the new value created after a merge
@@ -161,6 +166,9 @@ public class Board {
         // Recalculate layout for the new size
         calculateLayout();
 
+        // Re-scale images according to new cellSize
+        scaleImagesOnce();
+
         board = new Cell[boardSize][boardSize];
 
         for (int i = 0; i < boardSize; i++) {
@@ -170,6 +178,7 @@ public class Board {
                 int y = startY + i * cellSize;
 
                 int value;
+
                 // Shift old board down by 1 row so new row appears at the top
                 if (i > 0 && i <= oldSize && j < oldSize) {
                     value = oldBoard[i - 1][j].getValue();
@@ -177,7 +186,7 @@ public class Board {
                     value = getRandomValue();
                 }
 
-                board[i][j] = new Cell(value, x, y, cellSize, images);
+                board[i][j] = new Cell(value, x, y, cellSize, scaledImages);
             }
         }
 
@@ -203,7 +212,6 @@ public class Board {
             return;
         }
 
-        // If we already have a selection
         if (hasSelection) {
 
             // Second click on the SAME main cell -> merge
@@ -222,7 +230,6 @@ public class Board {
     }
 
     private int[] findCellByTouch(float touchX, float touchY) {
-        // Convert global screen coordinates to board-local coordinates
         float localX = touchX - startX;
         float localY = touchY - startY;
 
@@ -233,7 +240,7 @@ public class Board {
                 localX >= boardPixelSize || localY >= boardPixelSize) {
             return null;
         }
-        // Convert pixel position to grid indices
+
         int col = (int)(localX / cellSize);
         int row = (int)(localY / cellSize);
 
@@ -251,7 +258,6 @@ public class Board {
             return;
         }
 
-        // Mark all cells in group as picked (highlight)
         for (int[] cellPosition : group) {
             board[cellPosition[0]][cellPosition[1]].setPicked(true);
         }
@@ -263,7 +269,6 @@ public class Board {
     }
 
     private void clearSelection() {
-        // Clear picked state for all cells
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 board[i][j].setPicked(false);
@@ -284,10 +289,7 @@ public class Board {
         int targetValue = board[row][col].getValue();
 
         int[][] neighborOffsets = {
-                {1, 0},   // down
-                {-1, 0},  // up
-                {0, 1},   // right
-                {0, -1}   // left
+                {1, 0}, {-1, 0}, {0, 1}, {0, -1}
         };
 
         Queue<int[]> queue = new LinkedList<>();
@@ -296,30 +298,25 @@ public class Board {
 
         while (!queue.isEmpty()) {
             int[] current = queue.poll();
-            int currentRow = current[0];
-            int currentCol = current[1];
+            int r = current[0];
+            int c = current[1];
 
-            // Safety check: ignore empty cells
-            if (board[currentRow][currentCol].getValue() == 0) {
-                continue;
-            }
+            if (board[r][c].getValue() == 0) continue;
 
-            group.add(new int[]{currentRow, currentCol});
-
+            group.add(new int[]{r, c});
 
             for (int[] offset : neighborOffsets) {
-                int neighborRow = currentRow + offset[0];
-                int neighborCol = currentCol + offset[1];
+                int nr = r + offset[0];
+                int nc = c + offset[1];
 
-                if (isInsideBoard(neighborRow, neighborCol) &&
-                        !visited[neighborRow][neighborCol] &&
-                        board[neighborRow][neighborCol].getValue() == targetValue) {
+                if (isInsideBoard(nr, nc) &&
+                        !visited[nr][nc] &&
+                        board[nr][nc].getValue() == targetValue) {
 
-                    visited[neighborRow][neighborCol] = true;
-                    queue.add(new int[]{neighborRow, neighborCol});
+                    visited[nr][nc] = true;
+                    queue.add(new int[]{nr, nc});
                 }
             }
-
         }
 
         return group;
@@ -340,57 +337,39 @@ public class Board {
         }
 
         int baseValue = board[selectedRow][selectedCol].getValue();
-        int newValue = baseValue + 1;
-
-        if (newValue > 20) {newValue = 20;}
+        int newValue = Math.min(baseValue + 1, 20);
 
         // Update score (simple formula)
         score += selectedGroup.size() * newValue;
 
-        // Main cell gets the new value
         board[selectedRow][selectedCol].setValue(newValue);
-
         board[selectedRow][selectedCol].startPop();
 
-        // All other cells in group become empty
         for (int[] cellPosition : selectedGroup) {
+            int r = cellPosition[0];
+            int c = cellPosition[1];
 
-            int row = cellPosition[0];
-            int col = cellPosition[1];
+            if (r == selectedRow && c == selectedCol) continue;
 
-            if (row == selectedRow && col == selectedCol) {
-                continue;
-            }
-
-            board[row][col].setValue(0);
+            board[r][c].setValue(0);
         }
 
         clearSelection();
 
-        // First: apply gravity
         applyGravity();
-
-        // Then: fill empty cells
         fillEmptyCells();
 
-        // Update max value and possibly expand board
         handleNewValue(newValue);
 
-        // Check if no moves left
         if (!hasAvailableMove()) {
             gameOver = true;
         }
     }
 
-
-
-    // Moves cells down in each column to fill empty spaces (value=0)
     private void applyGravity() {
         for (int col = 0; col < boardSize; col++) {
-            // Points to the next row from the bottom where a non-empty value should be written
             int writeRow = boardSize - 1;
 
-            // Move non-empty values down
             for (int row = boardSize - 1; row >= 0; row--) {
                 int v = board[row][col].getValue();
                 if (v != 0) {
@@ -404,7 +383,6 @@ public class Board {
         }
     }
 
-    // Fills empty cells (value=0) with new random values (1..maxValueOnBoard)
     private void fillEmptyCells() {
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
@@ -416,28 +394,19 @@ public class Board {
     }
 
     public boolean hasAvailableMove() {
-
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
 
                 int value = board[i][j].getValue();
-                // Safety check: ignore empty cells
                 if (value == 0) continue;
 
-                // Check right neighbor
                 if (j + 1 < boardSize &&
-                        board[i][j + 1].getValue() == value) {
-                    return true;
-                }
+                        board[i][j + 1].getValue() == value) return true;
 
-                // Check down neighbor
                 if (i + 1 < boardSize &&
-                        board[i + 1][j].getValue() == value) {
-                    return true;
-                }
+                        board[i + 1][j].getValue() == value) return true;
             }
         }
-
         return false;
     }
 
@@ -457,30 +426,15 @@ public class Board {
         }
     }
 
-    public int getBoardSize() {
-        return boardSize;
-    }
-
-    public int getMaxValueOnBoard() {
-        return maxValueOnBoard;
-    }
-
-    public Cell[][] getBoard() {
-        return board;
-    }
-
-    public int getScore() {return score;}
-
-    public boolean isGameOver() {return gameOver;}
-
-    public boolean isExpansionTriggered() {return expansionTriggered;}
-
-    public void resetExpansionFlag() {expansionTriggered = false;}
-    public int getMaxTileCurrentGame() {return maxValueOnBoard;}
-
-    public int getStartX() {return startX;}
-
-    public int getStartY() {return startY;}
-
-    public int getCellSize() {return cellSize;}
+    public int getBoardSize() { return boardSize; }
+    public int getMaxValueOnBoard() { return maxValueOnBoard; }
+    public Cell[][] getBoard() { return board; }
+    public int getScore() { return score; }
+    public boolean isGameOver() { return gameOver; }
+    public boolean isExpansionTriggered() { return expansionTriggered; }
+    public void resetExpansionFlag() { expansionTriggered = false; }
+    public int getMaxTileCurrentGame() { return maxValueOnBoard; }
+    public int getStartX() { return startX; }
+    public int getStartY() { return startY; }
+    public int getCellSize() { return cellSize; }
 }
