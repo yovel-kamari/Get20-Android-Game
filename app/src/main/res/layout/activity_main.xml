@@ -20,36 +20,20 @@
     <!-- Logo -->
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="40dp"
         android:src="@drawable/background_get20" />
 
-    <!-- One line subtitle -->
-    <TextView
-        android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/logo"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="MERGE THE TILES UNTIL YOU REACH 20"
-        android:textColor="#E0E0E0"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:letterSpacing="0.05"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:gravity="center" />
 
     <!-- Stats Card -->
     <LinearLayout
         android:id="@+id/statsCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/subtitle"
-        android:layout_marginTop="40dp"
+        android:layout_below="@id/logo"
+        android:layout_marginTop="35dp"
         android:orientation="vertical"
         android:gravity="center"
         android:background="@drawable/stats_card">
@@ -58,19 +42,20 @@
             android:id="@+id/txtHighScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HIGH SCORE  894"
-            android:textColor="#FFD700"
-            android:textSize="22sp"
+            android:text="🏆 HIGH SCORE : 894"
+            android:textColor="#FFD54F"
+            android:textSize="26sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/txtMaxTile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MAX TILE  12"
-            android:textColor="#CCCCCC"
-            android:textSize="18sp"
-            android:layout_marginTop="8dp" />
+            android:text="🥇 MAX TILE : 12"
+            android:textColor="@color/white"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 
@@ -80,13 +65,12 @@
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="60dp"
-        android:background="@drawable/btn_neon"
+        android:layout_marginBottom="80dp"
         android:text="PLAY"
         android:textAllCaps="true"
         android:textColor="#FFFFFF"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:elevation="16dp" />
+        android:elevation="8dp" />
 
 </RelativeLayout>

@@ -1,27 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAF6ED">
+    android:background="#FAF6ED"
+    android:layoutDirection="ltr">
 
     <!-- Custom game drawing view -->
     <com.example.get20.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent" />
 
-    <!-- Score overlay -->
+    <!-- Score -->
     <TextView
         android:id="@+id/scoreText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Score: 0"
-        android:textSize="28sp"
+        android:text="⭐ 0"
+        android:textSize="40sp"
         android:textStyle="bold"
-        android:textColor="#111111"
-        android:background="#FFFFFF"
-        android:padding="16dp"
+        android:textColor="#004062"
+        android:background="@drawable/score_bg"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="24dp"/>
+        android:layout_marginTop="60dp"
+        app:tint="#004062"
+        android:elevation="4dp"/>
 
+
+    <!-- Instruction text -->
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Double tap tiles to merge and reach 20!"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#444444"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="150dp" />
+    <!-- Home button - LEFT -->
+    <ImageButton
+        android:id="@+id/homeButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/outline_arrow_back_24"
+        android:background="@drawable/circle_icon_bg"
+        android:layout_gravity="top|left"
+        android:elevation="4dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:contentDescription="Home"
+        app:tint="#004062" />
+
+    <!-- Restart button - RIGHT -->
+    <ImageButton
+        android:id="@+id/restartButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/baseline_refresh_24"
+        android:background="@drawable/circle_icon_bg"
+        android:layout_gravity="top|right"
+        android:elevation="4dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:contentDescription="Restart"
+        app:tint="#004062" />
 </FrameLayout>

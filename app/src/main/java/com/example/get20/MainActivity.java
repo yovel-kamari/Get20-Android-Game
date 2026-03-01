@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
         maxTileText = findViewById(R.id.txtMaxTile);
         Button playButton = findViewById(R.id.playButton);
 
-        // Start pulse animation
-        Animation pulse = AnimationUtils.loadAnimation(this, R.anim.pulse);
-        playButton.startAnimation(pulse);
 
         // Update UI with saved stats
         updateStatsDisplay();
@@ -48,7 +45,12 @@ public class MainActivity extends AppCompatActivity {
         int highScore = repository.getHighScore();
         int maxTile = repository.getMaxTile();
 
-        highScoreText.setText("High Score: " + highScore);
-        maxTileText.setText("Max Tile: " + maxTile);
+        highScoreText.setText("\uD83C\uDFC6 High Score: " + highScore);
+        maxTileText.setText("\uD83E\uDD47 Max Tile: " + maxTile);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateStatsDisplay();
     }
 }

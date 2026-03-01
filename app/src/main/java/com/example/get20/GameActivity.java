@@ -3,6 +3,9 @@ package com.example.get20;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -24,15 +27,48 @@ public class GameActivity extends AppCompatActivity {
 
         scoreText = findViewById(R.id.scoreText);
         gameView = findViewById(R.id.gameView);
+        TextView instructionText = findViewById(R.id.instructionText);
 
         loadImages();
         gameView.setImages(images);
 
-        gameView.setScoreListener(score ->
-                scoreText.setText("Score: " + score)
-        );
+        gameView.setScoreListener(score -> {
+
+            // Update only the number (no "Score" text)
+            scoreText.setText("⭐ "+ score);
+
+            // Small "pop" animation when score changes
+            // Scale up quickly, then return to normal size
+            scoreText.animate()
+                    .scaleX(1.2f)
+                    .scaleY(1.2f)
+                    .setDuration(100)
+                    .withEndAction(() ->
+                            scoreText.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                    );
+
+            // Hide instruction after first merge (score > 0)
+            // This makes it smarter than using a fixed timer
+            if (score > 0 && instructionText.getVisibility() == View.VISIBLE) {
+                instructionText.animate()
+                        .alpha(0f)
+                        .setDuration(400)
+                        .withEndAction(() ->
+                                instructionText.setVisibility(View.GONE)
+                        );
+            }
+        });
 
         gameView.setGameOverListener(this::onGameOver);
+
+        ImageButton restartButton = findViewById(R.id.restartButton);
+        ImageButton homeButton = findViewById(R.id.homeButton);
+
+        restartButton.setOnClickListener(v -> recreate());
+        homeButton.setOnClickListener(v -> finish());
     }
 
     private void onGameOver(int score, int maxTile) {

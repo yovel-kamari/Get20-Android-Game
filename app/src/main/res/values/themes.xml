@@ -1,9 +1,20 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Get20" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.Get20" parent="Theme.Material3.Dark.NoActionBar">
+
+        <!-- Primary brand color (action color) -->
+        <item name="colorPrimary">#FFC107</item>
+        <item name="colorOnPrimary">#1A1A1A</item>
+
+        <!-- Secondary accent -->
+        <item name="colorSecondary">#FFD54F</item>
+
+        <!-- Background -->
+        <item name="android:colorBackground">#0F172A</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">#0F172A</item>
+
     </style>
 
-    <style name="Theme.Get20" parent="Base.Theme.Get20" />
 </resources>
