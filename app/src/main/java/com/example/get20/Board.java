@@ -72,8 +72,6 @@ public class Board {
 
     private void calculateLayout() {
 
-        int margin = 40;
-
         // Use 95% of the smallest screen dimension
         int usableWidth = (int)(screenWidth * 0.95f);
         int usableHeight = (int)(screenHeight * 0.75f);
@@ -426,15 +424,8 @@ public class Board {
         }
     }
 
-    public int getBoardSize() { return boardSize; }
-    public int getMaxValueOnBoard() { return maxValueOnBoard; }
-    public Cell[][] getBoard() { return board; }
     public int getScore() { return score; }
-    public boolean isGameOver() { return gameOver; }
-    public boolean isExpansionTriggered() { return expansionTriggered; }
-    public void resetExpansionFlag() { expansionTriggered = false; }
-    public int getMaxTileCurrentGame() { return maxValueOnBoard; }
-    public int getStartX() { return startX; }
-    public int getStartY() { return startY; }
-    public int getCellSize() { return cellSize; }
+    public boolean isGameOver() {return gameOver;}
+
+    public int getMaxValueOnBoard() {return maxValueOnBoard;}
 }

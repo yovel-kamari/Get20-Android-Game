@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class GameActivity extends AppCompatActivity {
@@ -12,48 +13,71 @@ public class GameActivity extends AppCompatActivity {
     private GameView gameView;
     private TextView scoreText;
     private Bitmap[] images;
+    private GameRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        loadImages();
+        repository = new GameRepository(this);
 
         scoreText = findViewById(R.id.scoreText);
         gameView = findViewById(R.id.gameView);
 
+        loadImages();
         gameView.setImages(images);
 
         gameView.setScoreListener(score ->
                 scoreText.setText("Score: " + score)
         );
+
+        gameView.setGameOverListener(this::onGameOver);
+    }
+
+    private void onGameOver(int score, int maxTile) {
+        repository.saveHighScore(score);
+        repository.saveMaxTile(maxTile);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Game Over")
+                .setMessage("Score: " + score + "\nMax Tile: " + maxTile)
+                .setPositiveButton("Back to Home", (d, w) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     private void loadImages() {
-
-        images = new Bitmap[40];
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
         options.inPreferredConfig = Bitmap.Config.RGB_565;
 
-        for (int i = 1; i <= 20; i++) {
+        int[] normal = {
+                R.drawable.p1, R.drawable.p2, R.drawable.p3,
+                R.drawable.p4, R.drawable.p5, R.drawable.p6,
+                R.drawable.p7, R.drawable.p8, R.drawable.p9,
+                R.drawable.p10, R.drawable.p11, R.drawable.p12,
+                R.drawable.p13, R.drawable.p14, R.drawable.p15,
+                R.drawable.p16, R.drawable.p17, R.drawable.p18,
+                R.drawable.p19, R.drawable.p20
+        };
 
-            int normalResId = getResources().getIdentifier(
-                    "p" + i,
-                    "drawable",
-                    getPackageName()
-            );
+        int[] selected = {
+                R.drawable.p1a, R.drawable.p2a, R.drawable.p3a,
+                R.drawable.p4a, R.drawable.p5a, R.drawable.p6a,
+                R.drawable.p7a, R.drawable.p8a, R.drawable.p9a,
+                R.drawable.p10a, R.drawable.p11a, R.drawable.p12a,
+                R.drawable.p13a, R.drawable.p14a, R.drawable.p15a,
+                R.drawable.p16a, R.drawable.p17a, R.drawable.p18a,
+                R.drawable.p19a, R.drawable.p20a
+        };
 
-            int selectedResId = getResources().getIdentifier(
-                    "p" + i + "a",
-                    "drawable",
-                    getPackageName()
-            );
+        images = new Bitmap[40];
 
-            images[i - 1] = BitmapFactory.decodeResource(getResources(), normalResId, options);
-            images[i - 1 + 20] = BitmapFactory.decodeResource(getResources(), selectedResId, options);
+        for (int i = 0; i < 20; i++) {
+            images[i] = BitmapFactory.decodeResource(getResources(), normal[i], options);
+            images[i + 20] = BitmapFactory.decodeResource(getResources(), selected[i], options);
         }
     }
 }

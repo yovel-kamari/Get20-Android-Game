@@ -15,6 +15,9 @@ public class GameView extends View {
     private long lastTimeNanos;
     private ScoreListener scoreListener;
     private int lastScore = -1;
+    private GameOverListener gameOverListener;
+    private boolean gameOverNotified = false;
+
 
     // Constructor when creating view programmatically
     public GameView(Context context) {
@@ -71,6 +74,20 @@ public class GameView extends View {
 
         board.update(dt);
         board.draw(canvas);
+        // Check game over BEFORE scheduling next frame
+        if (board.isGameOver() && !gameOverNotified) {
+
+            gameOverNotified = true;
+
+            if (gameOverListener != null) {
+                gameOverListener.onGameOver(
+                        board.getScore(),
+                        board.getMaxValueOnBoard()
+                );
+            }
+
+            return; // stop drawing loop
+        }
 
         // Notify activity only when score changes
         int currentScore = board.getScore();
@@ -86,7 +103,8 @@ public class GameView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        if (board == null) return true;
+        if (board == null || board.isGameOver())
+            return true;
 
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             board.handleTouch(event.getX(), event.getY());
@@ -99,5 +117,11 @@ public class GameView extends View {
 
     public interface ScoreListener {
         void onScoreChanged(int score);
+    }
+    public void setGameOverListener(GameOverListener listener) {
+        this.gameOverListener = listener;
+    }
+    public interface GameOverListener {
+        void onGameOver(int finalScore, int maxTile);
     }
 }
