@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ public class GameActivity extends AppCompatActivity {
     private TextView scoreText;
     private Bitmap[] images;
     private GameRepository repository;
+    private boolean isDarkMode = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,22 @@ public class GameActivity extends AppCompatActivity {
 
         restartButton.setOnClickListener(v -> recreate());
         homeButton.setOnClickListener(v -> finish());
+
+        ImageButton themeButton = findViewById(R.id.themeButton);
+        FrameLayout rootLayout = findViewById(R.id.rootLayout);
+
+        themeButton.setOnClickListener(v -> {
+
+            isDarkMode = !isDarkMode;
+
+            if (isDarkMode) {
+                rootLayout.setBackgroundColor(0xFF121212);
+                themeButton.setColorFilter(0xFFFFFFFF);
+            } else {
+                rootLayout.setBackgroundColor(0xFFFAF6ED);
+                themeButton.setColorFilter(0xFF004062);
+            }
+        });
     }
 
     private void onGameOver(int score, int maxTile) {
