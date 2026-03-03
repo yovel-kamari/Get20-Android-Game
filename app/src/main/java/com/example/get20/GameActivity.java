@@ -80,10 +80,10 @@ public class GameActivity extends AppCompatActivity {
             isDarkMode = !isDarkMode;
 
             if (isDarkMode) {
-                rootLayout.setBackgroundColor(0xFF121212);
+                gameView.setBackgroundColorCustom(0xFF121212);
                 themeButton.setColorFilter(0xFFFFFFFF);
             } else {
-                rootLayout.setBackgroundColor(0xFFFAF6ED);
+                gameView.setBackgroundColorCustom(0xFFFAF6ED);
                 themeButton.setColorFilter(0xFF004062);
             }
         });

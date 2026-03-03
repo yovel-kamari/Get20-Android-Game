@@ -18,6 +18,15 @@ public class GameView extends View {
     private GameOverListener gameOverListener;
     private boolean gameOverNotified = false;
 
+    // Background floating particles
+    private float[] particleX;
+    private float[] particleY;
+    private float[] particleSpeed;
+    private float[] particleRadius;
+    private int particleCount = 10;
+    private boolean particlesInitialized = false;
+    private int backgroundColor = 0xFFFAF6ED;
+
 
     // Constructor when creating view programmatically
     public GameView(Context context) {
@@ -47,8 +56,25 @@ public class GameView extends View {
         // 2. View has valid size (>0)
         if (images != null && w > 0 && h > 0) {
             board = new Board(w, h, images);
+            initParticles(w, h);
             lastTimeNanos = System.nanoTime();
         }
+    }
+    private void initParticles(int w, int h) {
+
+        particleX = new float[particleCount];
+        particleY = new float[particleCount];
+        particleSpeed = new float[particleCount];
+        particleRadius = new float[particleCount];
+
+        for (int i = 0; i < particleCount; i++) {
+            particleX[i] = (float)(Math.random() * w);
+            particleY[i] = (float)(Math.random() * h);
+            particleSpeed[i] = 20 + (float)(Math.random() * 40); // slow float
+            particleRadius[i] = 5 + (float)(Math.random() * 10);
+        }
+
+        particlesInitialized = true;
     }
 
     public void setScoreListener(ScoreListener listener) {
@@ -72,8 +98,13 @@ public class GameView extends View {
         // Prevent big animation jumps after pause
         if (dt > 0.05f) dt = 0.05f;
 
+
+
         board.update(dt);
+        canvas.drawColor(backgroundColor);
+        drawParticles(canvas, dt);
         board.draw(canvas);
+
         // Check game over BEFORE scheduling next frame
         if (board.isGameOver() && !gameOverNotified) {
 
@@ -100,6 +131,39 @@ public class GameView extends View {
         postInvalidateOnAnimation();
     }
 
+    private void drawParticles(Canvas canvas, float dt) {
+
+        if (!particlesInitialized) return;
+
+        android.graphics.Paint paint = new android.graphics.Paint();
+        paint.setAntiAlias(true);
+
+        // Detect background brightness
+        int r = (backgroundColor >> 16) & 0xFF;
+        int g = (backgroundColor >> 8) & 0xFF;
+        int b = backgroundColor & 0xFF;
+
+        int brightness = (r + g + b) / 3;
+
+        if (brightness < 128) {
+            paint.setColor(0x33FFFFFF);   // light particles for dark bg
+        } else {
+            paint.setColor(0x22004062);   // darker particles for light bg
+        }
+
+        for (int i = 0; i < particleCount; i++) {
+
+            particleY[i] -= particleSpeed[i] * dt;
+
+            if (particleY[i] < -particleRadius[i]) {
+                particleY[i] = getHeight();
+                particleX[i] = (float)(Math.random() * getWidth());
+            }
+
+            canvas.drawCircle(particleX[i], particleY[i], particleRadius[i], paint);
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
@@ -123,5 +187,8 @@ public class GameView extends View {
     }
     public interface GameOverListener {
         void onGameOver(int finalScore, int maxTile);
+    }
+    public void setBackgroundColorCustom(int color) {
+        backgroundColor = color;
     }
 }
