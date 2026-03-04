@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/rootLayout"
-    android:background="#FAF6ED"
+    android:background="@drawable/background_main"
     android:layoutDirection="ltr">
 
     <!-- Custom game drawing view -->
@@ -13,34 +13,54 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Score -->
-    <TextView
-        android:id="@+id/scoreText"
+    <!-- Modern Score Card -->
+    <LinearLayout
+        android:id="@+id/scoreContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="⭐ 0"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:textColor="#004062"
-        android:background="@drawable/score_bg"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/stats_card"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="60dp"
-        app:tint="#004062"
-        android:elevation="4dp"/>
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="10dp"
+        android:elevation="6dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SCORE"
+            android:textColor="#B0BEC5"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.1" />
+
+        <TextView
+            android:id="@+id/scoreText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textColor="#FFD54F"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false" />
+    </LinearLayout>
 
     <!-- Instruction text -->
     <TextView
         android:id="@+id/instructionText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Double tap tiles to merge and reach 20!"
-        android:textSize="20sp"
+        android:text="Double tap tiles to merge!"
+        android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="#444444"
+        android:textColor="#80FFFFFF"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="150dp" />
-    <!-- Home button - LEFT -->
+        android:layout_marginTop="165dp"
+        android:alpha="0.8" />
+
+    <!-- Home button -->
     <ImageButton
         android:id="@+id/homeButton"
         android:layout_width="48dp"
@@ -52,9 +72,9 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:contentDescription="Home"
-        app:tint="#004062" />
+        app:tint="#FFFFFF" />
 
-    <!-- Restart button - RIGHT -->
+    <!-- Restart button -->
     <ImageButton
         android:id="@+id/restartButton"
         android:layout_width="48dp"
@@ -66,7 +86,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:contentDescription="Restart"
-        app:tint="#004062" />
+        app:tint="#FFFFFF" />
 
     <!-- Dark Mode Toggle -->
     <ImageButton
@@ -79,5 +99,5 @@
         android:layout_margin="20dp"
         android:elevation="4dp"
         android:contentDescription="Toggle Theme"
-        app:tint="#004062"/>
+        app:tint="#FFFFFF"/>
 </FrameLayout>
