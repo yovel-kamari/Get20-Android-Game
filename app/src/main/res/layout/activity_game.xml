@@ -13,6 +13,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!-- Winning Glow Overlay (Hidden by default) -->
+    <View
+        android:id="@+id/winGlow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/circle_icon_bg"
+        android:backgroundTint="#FFD54F"
+        android:alpha="0"
+        android:visibility="gone" />
+
     <!-- Modern Score Card -->
     <LinearLayout
         android:id="@+id/scoreContainer"
@@ -51,7 +61,7 @@
             android:shadowRadius="15" />
     </LinearLayout>
 
-    <!-- Enhanced Hint/Instruction Badge -->
+    <!-- Hint Badge -->
     <LinearLayout
         android:id="@+id/instructionContainer"
         android:layout_width="wrap_content"
@@ -84,7 +94,7 @@
             android:lineSpacingExtra="2dp" />
     </LinearLayout>
 
-    <!-- Home button -->
+    <!-- Navigation Buttons -->
     <ImageButton
         android:id="@+id/homeButton"
         android:layout_width="48dp"
@@ -98,7 +108,6 @@
         android:contentDescription="Home"
         app:tint="#FFFFFF" />
 
-    <!-- Restart button -->
     <ImageButton
         android:id="@+id/restartButton"
         android:layout_width="48dp"
@@ -112,7 +121,6 @@
         android:contentDescription="Restart"
         app:tint="#FFFFFF" />
 
-    <!-- Dark Mode Toggle -->
     <ImageButton
         android:id="@+id/themeButton"
         android:layout_width="48dp"

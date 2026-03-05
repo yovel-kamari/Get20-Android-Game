@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/stats_card"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="GAME OVER"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1"
+        android:gravity="center" />
+
+    <View
+        android:layout_width="60dp"
+        android:layout_height="1.5dp"
+        android:background="#33FFFFFF"
+        android:layout_marginVertical="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FINAL SCORE"
+        android:textColor="#B0BEC5"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1" />
+
+    <TextView
+        android:id="@+id/finalScoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        android:textColor="#FFD54F"
+        android:textSize="48sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/maxTileLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Max Tile: 0"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:alpha="0.8"
+        android:layout_marginTop="10dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnBackHome"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/btn_play_bg"
+        android:text="BACK TO HOME"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:elevation="4dp" />
+
+</LinearLayout>

@@ -2,23 +2,28 @@ package com.example.get20;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Dialog;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowInsetsControllerCompat;
+
+import java.util.Random;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -29,6 +34,8 @@ public class GameActivity extends AppCompatActivity {
     private boolean isDarkMode = true;
     private ObjectAnimator hintAnimator;
     private View instructionContainer;
+    private View winGlow;
+    private FrameLayout rootLayout;
     
     private final Handler hintHandler = new Handler(Looper.getMainLooper());
     private Runnable hintRunnable;
@@ -43,11 +50,13 @@ public class GameActivity extends AppCompatActivity {
         scoreText = findViewById(R.id.scoreText);
         gameView = findViewById(R.id.gameView);
         instructionContainer = findViewById(R.id.instructionContainer);
+        winGlow = findViewById(R.id.winGlow);
+        rootLayout = findViewById(R.id.rootLayout);
+        
         LinearLayout scoreContainer = findViewById(R.id.scoreContainer);
         ImageButton restartButton = findViewById(R.id.restartButton);
         ImageButton homeButton = findViewById(R.id.homeButton);
         ImageButton themeButton = findViewById(R.id.themeButton);
-        FrameLayout rootLayout = findViewById(R.id.rootLayout);
 
         loadImages();
         gameView.setImages(images);
@@ -55,20 +64,15 @@ public class GameActivity extends AppCompatActivity {
         applyDarkMode(rootLayout, gameView, scoreContainer, scoreText, themeButton, restartButton, homeButton);
         playEntranceAnimation(scoreContainer, homeButton, restartButton);
         
-        // Initial hint setup
         setupHintTimer();
-        // Show hint immediately on start
         showTutorialHint();
         gameView.showHint();
 
         gameView.setScoreListener(score -> {
-            resetHintTimer(); // Reset the 10s timer on any activity
-            
+            resetHintTimer(); 
             scoreText.setText(String.valueOf(score));
             scoreText.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() ->
                     scoreText.animate().scaleX(1f).scaleY(1f).setDuration(100));
-
-            // Hide hint message and stop highlighting if a move was made
             hideTutorialHint();
         });
 
@@ -87,11 +91,91 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
+    private void onGameOver(int score, int maxTile, boolean isWin) {
+        boolean isNewBest = score > repository.getHighScore();
+        repository.saveHighScore(score);
+        repository.saveMaxTile(maxTile);
+        
+        if (isWin) {
+            triggerWinEffects();
+        }
+        
+        // Delay dialog slightly to let win effects start
+        new Handler(Looper.getMainLooper()).postDelayed(() -> 
+            showGameOverDialog(score, maxTile, isNewBest, isWin), isWin ? 1000 : 0);
+    }
+
+    private void triggerWinEffects() {
+        // 1. Show and animate the winning glow
+        winGlow.setVisibility(View.VISIBLE);
+        ObjectAnimator glowAnim = ObjectAnimator.ofFloat(winGlow, "alpha", 0f, 0.4f);
+        glowAnim.setDuration(1000);
+        glowAnim.setRepeatMode(ValueAnimator.REVERSE);
+        glowAnim.setRepeatCount(3);
+        glowAnim.start();
+
+        // 2. Simple Confetti burst using small colored views
+        final int[] colors = {Color.YELLOW, Color.RED, Color.GREEN, Color.BLUE, Color.MAGENTA, Color.CYAN};
+        final Random rand = new Random();
+        
+        for (int i = 0; i < 60; i++) {
+            final View confetti = new View(this);
+            int size = rand.nextInt(15) + 10;
+            confetti.setLayoutParams(new ViewGroup.LayoutParams(size, size));
+            confetti.setBackgroundColor(colors[rand.nextInt(colors.length)]);
+            confetti.setX(rand.nextInt(Math.max(1, rootLayout.getWidth())));
+            confetti.setY(-100);
+            confetti.setRotation(rand.nextInt(360));
+            rootLayout.addView(confetti);
+
+            confetti.animate()
+                    .translationY(rootLayout.getHeight() + 200)
+                    .rotationBy(rand.nextInt(1000) - 500)
+                    .setDuration(rand.nextInt(2000) + 2000)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .withEndAction(() -> rootLayout.removeView(confetti))
+                    .start();
+        }
+    }
+
+    private void showGameOverDialog(int finalScore, int maxTile, boolean isNewBest, boolean isWin) {
+        final Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_game_over);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+
+        TextView title = dialog.findViewById(R.id.dialogTitle);
+        TextView finalScoreText = dialog.findViewById(R.id.finalScoreText);
+        TextView maxTileLabel = dialog.findViewById(R.id.maxTileLabel);
+        Button backHome = dialog.findViewById(R.id.btnBackHome);
+
+        finalScoreText.setText(String.valueOf(finalScore));
+        maxTileLabel.setText("Max Tile: " + maxTile);
+
+        if (isWin) {
+            title.setText("🏆 YOU WON! 🏆");
+            title.setTextColor(0xFFFFD54F);
+        } else if (isNewBest) {
+            title.setText("🎉 NEW RECORD! 🎉");
+            title.setTextColor(0xFFFFD54F);
+        } else {
+            title.setText("GAME OVER");
+            title.setTextColor(Color.WHITE);
+        }
+
+        backHome.setOnClickListener(v -> {
+            dialog.dismiss();
+            finish();
+        });
+
+        dialog.show();
+    }
+
     private void setupHintTimer() {
         hintRunnable = () -> {
             if (!isFinishing()) {
                 showTutorialHint();
-                gameView.showHint(); // Highlight a group on the board
+                gameView.showHint();
             }
         };
         resetHintTimer();
@@ -99,7 +183,7 @@ public class GameActivity extends AppCompatActivity {
 
     private void resetHintTimer() {
         hintHandler.removeCallbacks(hintRunnable);
-        hintHandler.postDelayed(hintRunnable, 10000); // 10 seconds of inactivity
+        hintHandler.postDelayed(hintRunnable, 10000); 
     }
 
     private void showTutorialHint() {
@@ -110,12 +194,7 @@ public class GameActivity extends AppCompatActivity {
             instructionContainer.setScaleY(0.8f);
         }
         
-        instructionContainer.animate()
-                .alpha(1f)
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(500)
-                .start();
+        instructionContainer.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(500).start();
                 
         if (hintAnimator == null || !hintAnimator.isRunning()) {
             hintAnimator = ObjectAnimator.ofFloat(instructionContainer, "alpha", 0.6f, 1.0f);
@@ -130,7 +209,7 @@ public class GameActivity extends AppCompatActivity {
     private void hideTutorialHint() {
         if (instructionContainer.getVisibility() == View.VISIBLE) {
             if (hintAnimator != null) hintAnimator.cancel();
-            gameView.clearHint(); // Remove board highlighting
+            gameView.clearHint(); 
             instructionContainer.animate()
                     .alpha(0f)
                     .scaleX(0.8f)
@@ -199,17 +278,6 @@ public class GameActivity extends AppCompatActivity {
         WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
         controller.setAppearanceLightNavigationBars(true);
         controller.setAppearanceLightStatusBars(true);
-    }
-
-    private void onGameOver(int score, int maxTile) {
-        repository.saveHighScore(score);
-        repository.saveMaxTile(maxTile);
-        new AlertDialog.Builder(this)
-                .setTitle("Game Over")
-                .setMessage("Score: " + score + "\nMax Tile: " + maxTile)
-                .setPositiveButton("Back to Home", (d, w) -> finish())
-                .setCancelable(false)
-                .show();
     }
 
     private void loadImages() {

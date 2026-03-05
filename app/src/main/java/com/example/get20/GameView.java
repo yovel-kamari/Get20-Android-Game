@@ -6,6 +6,9 @@ import android.util.AttributeSet;
 import android.view.*;
 import java.util.ArrayList;
 
+/**
+ * GameView acts as the central rendering engine and input handler.
+ */
 public class GameView extends View {
     private Board board;
     private Bitmap[] images;
@@ -49,21 +52,15 @@ public class GameView extends View {
         particlesInitialized = true;
     }
 
-    /**
-     * Finds a possible move and highlights it on the board.
-     */
     public void showHint() {
         if (board == null) return;
-        clearHint(); // Clear old hint first
+        clearHint();
         currentHintGroup = board.getFirstAvailableGroup();
         if (currentHintGroup != null) {
             board.setHintGroup(currentHintGroup, true);
         }
     }
 
-    /**
-     * Removes any active move highlighting.
-     */
     public void clearHint() {
         if (board != null && currentHintGroup != null) {
             board.setHintGroup(currentHintGroup, false);
@@ -98,7 +95,9 @@ public class GameView extends View {
 
         if (board.isGameOver() && !gameOverNotified) {
             gameOverNotified = true;
-            if (gameOverListener != null) gameOverListener.onGameOver(board.getScore(), board.getMaxValueOnBoard());
+            if (gameOverListener != null) 
+                // Updated to pass the win state
+                gameOverListener.onGameOver(board.getScore(), board.getMaxValueOnBoard(), board.isGameWon());
             return;
         }
 
@@ -112,18 +111,19 @@ public class GameView extends View {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (board != null && !board.isGameOver() && event.getAction() == MotionEvent.ACTION_DOWN) {
-            clearHint(); // Remove hint as soon as user interacts
+            clearHint();
             board.handleTouch(event.getX(), event.getY());
             invalidate();
-            
-            // Notify activity that an interaction happened to reset hint timer
             if (scoreListener != null) scoreListener.onScoreChanged(board.getScore());
         }
         return true;
     }
 
     public interface ScoreListener { void onScoreChanged(int score); }
-    public interface GameOverListener { void onGameOver(int score, int maxTile); }
+    
+    // Updated Interface to include win status
+    public interface GameOverListener { void onGameOver(int score, int maxTile, boolean isWin); }
+
     public void setScoreListener(ScoreListener l) { this.scoreListener = l; }
     public void setGameOverListener(GameOverListener l) { this.gameOverListener = l; }
     public void setBackgroundColorCustom(int c) { this.backgroundColor = c; invalidate(); }
