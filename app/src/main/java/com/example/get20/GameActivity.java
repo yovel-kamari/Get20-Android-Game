@@ -1,10 +1,16 @@
 package com.example.get20;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -12,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 public class GameActivity extends AppCompatActivity {
 
@@ -20,6 +27,11 @@ public class GameActivity extends AppCompatActivity {
     private Bitmap[] images;
     private GameRepository repository;
     private boolean isDarkMode = true;
+    private ObjectAnimator hintAnimator;
+    private View instructionContainer;
+    
+    private final Handler hintHandler = new Handler(Looper.getMainLooper());
+    private Runnable hintRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +42,7 @@ public class GameActivity extends AppCompatActivity {
 
         scoreText = findViewById(R.id.scoreText);
         gameView = findViewById(R.id.gameView);
-        TextView instructionText = findViewById(R.id.instructionText);
+        instructionContainer = findViewById(R.id.instructionContainer);
         LinearLayout scoreContainer = findViewById(R.id.scoreContainer);
         ImageButton restartButton = findViewById(R.id.restartButton);
         ImageButton homeButton = findViewById(R.id.homeButton);
@@ -40,18 +52,24 @@ public class GameActivity extends AppCompatActivity {
         loadImages();
         gameView.setImages(images);
 
-        // Initial Dark Mode Setup
         applyDarkMode(rootLayout, gameView, scoreContainer, scoreText, themeButton, restartButton, homeButton);
+        playEntranceAnimation(scoreContainer, homeButton, restartButton);
+        
+        // Initial hint setup
+        setupHintTimer();
+        // Show hint immediately on start
+        showTutorialHint();
+        gameView.showHint();
 
         gameView.setScoreListener(score -> {
+            resetHintTimer(); // Reset the 10s timer on any activity
+            
             scoreText.setText(String.valueOf(score));
             scoreText.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100).withEndAction(() ->
                     scoreText.animate().scaleX(1f).scaleY(1f).setDuration(100));
 
-            if (score > 0 && instructionText.getVisibility() == View.VISIBLE) {
-                instructionText.animate().alpha(0f).setDuration(400).withEndAction(() ->
-                        instructionText.setVisibility(View.GONE));
-            }
+            // Hide hint message and stop highlighting if a move was made
+            hideTutorialHint();
         });
 
         gameView.setGameOverListener(this::onGameOver);
@@ -69,12 +87,83 @@ public class GameActivity extends AppCompatActivity {
         });
     }
 
+    private void setupHintTimer() {
+        hintRunnable = () -> {
+            if (!isFinishing()) {
+                showTutorialHint();
+                gameView.showHint(); // Highlight a group on the board
+            }
+        };
+        resetHintTimer();
+    }
+
+    private void resetHintTimer() {
+        hintHandler.removeCallbacks(hintRunnable);
+        hintHandler.postDelayed(hintRunnable, 10000); // 10 seconds of inactivity
+    }
+
+    private void showTutorialHint() {
+        if (instructionContainer.getVisibility() == View.GONE) {
+            instructionContainer.setVisibility(View.VISIBLE);
+            instructionContainer.setAlpha(0f);
+            instructionContainer.setScaleX(0.8f);
+            instructionContainer.setScaleY(0.8f);
+        }
+        
+        instructionContainer.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(500)
+                .start();
+                
+        if (hintAnimator == null || !hintAnimator.isRunning()) {
+            hintAnimator = ObjectAnimator.ofFloat(instructionContainer, "alpha", 0.6f, 1.0f);
+            hintAnimator.setDuration(1000);
+            hintAnimator.setRepeatMode(ValueAnimator.REVERSE);
+            hintAnimator.setRepeatCount(ValueAnimator.INFINITE);
+            hintAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            hintAnimator.start();
+        }
+    }
+
+    private void hideTutorialHint() {
+        if (instructionContainer.getVisibility() == View.VISIBLE) {
+            if (hintAnimator != null) hintAnimator.cancel();
+            gameView.clearHint(); // Remove board highlighting
+            instructionContainer.animate()
+                    .alpha(0f)
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .setDuration(400)
+                    .withEndAction(() -> instructionContainer.setVisibility(View.GONE));
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        hintHandler.removeCallbacks(hintRunnable);
+    }
+
+    private void playEntranceAnimation(View score, View home, View restart) {
+        score.setTranslationY(-300f);
+        home.setTranslationY(-300f);
+        restart.setTranslationY(-300f);
+        score.setAlpha(0f);
+        home.setAlpha(0f);
+        restart.setAlpha(0f);
+
+        score.animate().translationY(0f).alpha(1f).setDuration(700).setStartDelay(200).setInterpolator(new DecelerateInterpolator()).start();
+        home.animate().translationY(0f).alpha(1f).setDuration(700).setStartDelay(400).setInterpolator(new DecelerateInterpolator()).start();
+        restart.animate().translationY(0f).alpha(1f).setDuration(700).setStartDelay(500).setInterpolator(new DecelerateInterpolator()).start();
+    }
+
     private void applyDarkMode(View root, GameView game, View scoreBox, TextView scoreTxt, ImageButton themeBtn, ImageButton restartBtn, ImageButton homeBtn) {
         root.setBackgroundResource(R.drawable.background_main);
         game.setBackgroundColorCustom(Color.TRANSPARENT);
         scoreBox.setBackgroundResource(R.drawable.stats_card);
-        scoreTxt.setTextColor(0xFFFFD54F); // Gold
-        
+        scoreTxt.setTextColor(0xFFFFD54F);
         int white = Color.WHITE;
         themeBtn.setBackgroundResource(R.drawable.stats_card);
         themeBtn.setColorFilter(white);
@@ -82,15 +171,21 @@ public class GameActivity extends AppCompatActivity {
         restartBtn.setColorFilter(white);
         homeBtn.setBackgroundResource(R.drawable.stats_card);
         homeBtn.setColorFilter(white);
+
+        getWindow().setNavigationBarColor(Color.BLACK);
+        getWindow().setStatusBarColor(Color.BLACK);
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        controller.setAppearanceLightNavigationBars(false);
+        controller.setAppearanceLightStatusBars(false);
     }
 
     private void applyLightMode(View root, GameView game, View scoreBox, TextView scoreTxt, ImageButton themeBtn, ImageButton restartBtn, ImageButton homeBtn) {
+        int creamColor = 0xFFFAF6ED;
         root.setBackground(null);
-        root.setBackgroundColor(0xFFFAF6ED); // Cream
-        game.setBackgroundColorCustom(0xFFFAF6ED);
+        root.setBackgroundColor(creamColor); 
+        game.setBackgroundColorCustom(creamColor);
         scoreBox.setBackgroundResource(R.drawable.stats_card_light);
-        scoreTxt.setTextColor(0xFF004062); // Dark Blue
-        
+        scoreTxt.setTextColor(0xFF004062);
         int darkBlue = 0xFF004062;
         themeBtn.setBackgroundResource(R.drawable.stats_card_light);
         themeBtn.setColorFilter(darkBlue);
@@ -98,6 +193,12 @@ public class GameActivity extends AppCompatActivity {
         restartBtn.setColorFilter(darkBlue);
         homeBtn.setBackgroundResource(R.drawable.stats_card_light);
         homeBtn.setColorFilter(darkBlue);
+
+        getWindow().setNavigationBarColor(creamColor);
+        getWindow().setStatusBarColor(creamColor);
+        WindowInsetsControllerCompat controller = new WindowInsetsControllerCompat(getWindow(), getWindow().getDecorView());
+        controller.setAppearanceLightNavigationBars(true);
+        controller.setAppearanceLightStatusBars(true);
     }
 
     private void onGameOver(int score, int maxTile) {

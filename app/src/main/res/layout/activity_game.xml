@@ -34,7 +34,7 @@
             android:textColor="#B0BEC5"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:letterSpacing="0.1" />
+            android:letterSpacing="0.15" />
 
         <TextView
             android:id="@+id/scoreText"
@@ -44,21 +44,45 @@
             android:textColor="#FFD54F"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:includeFontPadding="false" />
+            android:includeFontPadding="false"
+            android:shadowColor="#A0FFD54F"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="15" />
     </LinearLayout>
 
-    <!-- Instruction text -->
-    <TextView
-        android:id="@+id/instructionText"
+    <!-- Enhanced Hint/Instruction Badge -->
+    <LinearLayout
+        android:id="@+id/instructionContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Double tap tiles to merge!"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#80FFFFFF"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/stats_card"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="165dp"
-        android:alpha="0.8" />
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:elevation="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💡"
+            android:textSize="16sp"
+            android:layout_marginEnd="8dp"/>
+
+        <TextView
+            android:id="@+id/instructionText"
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:text="Double tap a tile to merge tiles in order to reach 20!"
+            android:textSize="14sp"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp" />
+    </LinearLayout>
 
     <!-- Home button -->
     <ImageButton

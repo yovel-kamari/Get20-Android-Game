@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/**
+ * Main menu activity. Handles statistics display and decorative background animations.
+ */
 public class MainActivity extends AppCompatActivity {
     private GameRepository repository;
     private TextView highScoreText;
@@ -26,11 +29,12 @@ public class MainActivity extends AppCompatActivity {
 
         repository = new GameRepository(this);
 
+        // UI Initialization
         highScoreText = findViewById(R.id.txtHighScore);
         maxTileText = findViewById(R.id.txtMaxTile);
         Button playButton = findViewById(R.id.playButton);
 
-        // Background views for animation
+        // Background views for decorative animations
         View logoGlow = findViewById(R.id.logoGlow);
         View tile1 = findViewById(R.id.bgTile1);
         View tile2 = findViewById(R.id.bgTile2);
@@ -40,16 +44,18 @@ public class MainActivity extends AppCompatActivity {
 
         updateStatsDisplay();
         
-        // Start Animations with much larger movement and diagonal paths
-        startIntenseAnimation(tile1, 150f, 100f, 15f, 5000);
-        startIntenseAnimation(tile2, -120f, -80f, -20f, 4500);
-        startIntenseAnimation(tile3, 180f, 50f, 10f, 6000);
-        startIntenseAnimation(tile4, -140f, 120f, 25f, 5500);
-        startIntenseAnimation(tile5, 130f, -150f, -15f, 4800);
+        // Start decorative animations for tiles
+        // Parameters: View, Y distance, X distance, Rotation degree, Duration
+        startDecorativeAnimation(tile1, 150f, 100f, 15f, 5000);
+        startDecorativeAnimation(tile2, -120f, -80f, -20f, 4500);
+        startDecorativeAnimation(tile3, 180f, 50f, 10f, 6000);
+        startDecorativeAnimation(tile4, -140f, 120f, 25f, 5500);
+        startDecorativeAnimation(tile5, 130f, -150f, -15f, 4800);
         
+        // Start the 'breathing' effect for the logo glow
         startGlowPulse(logoGlow);
 
-        // Press effect for play button
+        // Interaction: Small shrink effect when play button is pressed
         playButton.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
@@ -69,8 +75,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void startIntenseAnimation(View view, float transY, float transX, float rotation, int duration) {
-        // Y Movement
+    /**
+     * Creates a complex floating and rotating animation for background tiles.
+     */
+    private void startDecorativeAnimation(View view, float transY, float transX, float rotation, int duration) {
+        // Vertical movement (Y)
         ObjectAnimator animY = ObjectAnimator.ofFloat(view, "translationY", -transY, transY);
         animY.setDuration(duration);
         animY.setRepeatMode(ValueAnimator.REVERSE);
@@ -78,15 +87,15 @@ public class MainActivity extends AppCompatActivity {
         animY.setInterpolator(new AccelerateDecelerateInterpolator());
         animY.start();
 
-        // X Movement
+        // Horizontal movement (X)
         ObjectAnimator animX = ObjectAnimator.ofFloat(view, "translationX", -transX, transX);
-        animX.setDuration(duration + 500); // Slightly different timing for more organic feel
+        animX.setDuration(duration + 500); // Offset timing for more natural feel
         animX.setRepeatMode(ValueAnimator.REVERSE);
         animX.setRepeatCount(ValueAnimator.INFINITE);
         animX.setInterpolator(new AccelerateDecelerateInterpolator());
         animX.start();
 
-        // Rotation Movement
+        // Rotation
         ObjectAnimator animRot = ObjectAnimator.ofFloat(view, "rotation", view.getRotation() - rotation, view.getRotation() + rotation);
         animRot.setDuration(duration + 1000);
         animRot.setRepeatMode(ValueAnimator.REVERSE);
@@ -95,9 +104,12 @@ public class MainActivity extends AppCompatActivity {
         animRot.start();
     }
 
+    /**
+     * Creates a pulsing 'breathing' effect by animating alpha (opacity).
+     */
     private void startGlowPulse(View view) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(view, "alpha", 0.05f, 0.15f);
-        animator.setDuration(2000);
+        animator.setDuration(2500);
         animator.setRepeatMode(ValueAnimator.REVERSE);
         animator.setRepeatCount(ValueAnimator.INFINITE);
         animator.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -105,10 +117,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateStatsDisplay() {
-        int highScore = repository.getHighScore();
-        int maxTile = repository.getMaxTile();
-        highScoreText.setText(String.valueOf(highScore));
-        maxTileText.setText("🥇 MAX TILE: " + maxTile);
+        highScoreText.setText(String.valueOf(repository.getHighScore()));
+        maxTileText.setText("🥇 MAX TILE: " + repository.getMaxTile());
     }
 
     @Override
