@@ -51,11 +51,11 @@ public class Cell implements ICell {
         // 1. Pop Animation Logic:
         // Uses a Sine wave based on the remaining time to create a smooth expand/contract effect.
         if (popTime > 0) {
-            popTime -= dt;
+            popTime -= dt; // Countdown the timer by elapsed time
             float progress = 1f - (Math.max(0, popTime) / POP_DURATION); // Progress from 0.0 to 1.0
             // Sine from 0 to PI creates a value that goes 0 -> 1 -> 0
             scale = 1f + (POP_MAX_SCALE - 1f) * (float) Math.sin(progress * Math.PI);
-            if (popTime <= 0) scale = 1f;
+            if (popTime <= 0) scale = 1f; // Reset to normal size at the end
         }
 
         // 2. Gravity Drop Physics:
@@ -66,13 +66,13 @@ public class Cell implements ICell {
             
             // Check for collision with the "floor" (the target position)
             if (offsetY >= 0) {
-                offsetY = 0;
+                offsetY = 0; // Snap tile to its target position
                 // Bounce logic: if moving fast enough, reverse and reduce velocity
                 if (Math.abs(velocityY) > 500f) { 
-                    velocityY = -velocityY * BOUNCE_DAMPING; 
+                    velocityY = -velocityY * BOUNCE_DAMPING; // Reverse speed and dampen it
                     offsetY = -1f; // Force the logic to continue for the bounce movement
                 } else {
-                    velocityY = 0; // Settle completely
+                    velocityY = 0; // Too slow to bounce, stop completely
                 }
             }
         }
