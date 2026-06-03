@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class Board {
 
-    private static final int INITIAL_SIZE = 5;    // starting grid is 5x5
+    private static final int INITIAL_SIZE = 7;    // debug: start on 7x7 to demo win on largest board
     private static final int MAX_VALUE = 20;      // reaching this tile wins the game
     private static final int EXPAND_TO_6_AT = 10; // grow 5x5 -> 6x6 when a 10 is created
     private static final int EXPAND_TO_7_AT = 15; // grow 6x6 -> 7x7 when a 15 is created
