@@ -50,8 +50,7 @@ public class Board {
     }
 
     private int getRandomInitialValue() {
-        int chance = random.nextInt(100);
-        int val = (chance < 90) ? (random.nextInt(3) + 1) : 4; // 90% chance 1-3, else 4
+        int val = 19; // debug: always spawn 19s so first merge triggers win at 20
         updateHighestTile(val);
         return val;
     }
