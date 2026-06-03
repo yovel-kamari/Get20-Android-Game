@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Get20</string>
+    <string name="app_name">Get20 | Expansion</string>
 
     <!-- Main menu -->
     <string name="menu_max_tile">🥇 MAX TILE: %1$d</string>

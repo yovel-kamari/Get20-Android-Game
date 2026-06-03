@@ -9,7 +9,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.get20"
+        applicationId = "com.example.get20.expansion"
         minSdk = 24
         targetSdk = 36
         versionCode = 13

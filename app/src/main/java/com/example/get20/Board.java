@@ -12,7 +12,7 @@ public class Board {
     private static final int INITIAL_SIZE = 5;    // starting grid is 5x5
     private static final int MAX_VALUE = 20;      // reaching this tile wins the game
     private static final int EXPAND_TO_6_AT = 10; // grow 5x5 -> 6x6 when a 10 is created
-    private static final int EXPAND_TO_7_AT = 15; // grow 6x6 -> 7x7 when a 15 is created
+    private static final int EXPAND_TO_7_AT = 11; // grow 6x6 -> 7x7 when a 15 is created
 
     private Cell[][] board;
     private int boardSize, cellSize, score;
@@ -50,8 +50,7 @@ public class Board {
     }
 
     private int getRandomInitialValue() {
-        int chance = random.nextInt(100);
-        int val = (chance < 90) ? (random.nextInt(3) + 1) : 4; // 90% chance 1-3, else 4
+        int val = 9; // debug: always spawn 9s so first merge triggers 6x6 expansion
         updateHighestTile(val);
         return val;
     }
