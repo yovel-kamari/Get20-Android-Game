@@ -61,13 +61,14 @@
             android:shadowRadius="15" />
     </LinearLayout>
 
-    <!-- Hint Badge -->
+    <!-- Hint Badge (shown explicitly for new games / after idle) -->
     <LinearLayout
         android:id="@+id/instructionContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
+        android:visibility="gone"
         android:background="@drawable/stats_card"
         android:layout_gravity="top|center_horizontal"
         android:layout_marginTop="165dp"
@@ -101,7 +102,7 @@
         android:layout_height="48dp"
         android:src="@drawable/outline_arrow_back_24"
         android:background="@drawable/circle_icon_bg"
-        android:layout_gravity="top|left"
+        android:layout_gravity="top|start"
         android:elevation="4dp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
@@ -114,7 +115,7 @@
         android:layout_height="48dp"
         android:src="@drawable/baseline_refresh_24"
         android:background="@drawable/circle_icon_bg"
-        android:layout_gravity="top|right"
+        android:layout_gravity="top|end"
         android:elevation="4dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
@@ -127,7 +128,7 @@
         android:layout_height="48dp"
         android:src="@drawable/ic_dark_mode"
         android:background="@drawable/circle_icon_bg"
-        android:layout_gravity="bottom|right"
+        android:layout_gravity="bottom|end"
         android:layout_margin="20dp"
         android:elevation="4dp"
         android:contentDescription="Toggle Theme"

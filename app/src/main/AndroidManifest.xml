@@ -11,10 +11,13 @@
         android:roundIcon="@drawable/background_get20"
         android:supportsRtl="true"
         android:theme="@style/Theme.Get20">
-        <activity android:name=".GameActivity" />
+        <activity
+            android:name=".GameActivity"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

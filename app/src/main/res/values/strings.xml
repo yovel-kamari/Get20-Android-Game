@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Get20</string>
+
+    <!-- Main menu -->
+    <string name="menu_max_tile">🥇 MAX TILE: %1$d</string>
+
+    <!-- Game over dialog -->
+    <string name="dialog_max_tile">Max Tile: %1$d</string>
+    <string name="dialog_you_won">🏆 YOU WON! 🏆</string>
+    <string name="dialog_new_record">🎉 NEW RECORD! 🎉</string>
+    <string name="dialog_game_over">GAME OVER</string>
 </resources>
