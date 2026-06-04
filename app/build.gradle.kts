@@ -31,6 +31,10 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    testOptions {
+        // let local JVM unit tests run: stubbed Android calls (e.g. Bitmap) return defaults instead of throwing
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
