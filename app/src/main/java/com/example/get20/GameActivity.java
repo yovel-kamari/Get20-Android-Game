@@ -352,7 +352,6 @@ public class GameActivity extends AppCompatActivity {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
-        options.inPreferredConfig = Bitmap.Config.RGB_565; // half the memory of the default
         int[] normal = {R.drawable.p1, R.drawable.p2, R.drawable.p3, R.drawable.p4, R.drawable.p5, R.drawable.p6, R.drawable.p7, R.drawable.p8, R.drawable.p9, R.drawable.p10, R.drawable.p11, R.drawable.p12, R.drawable.p13, R.drawable.p14, R.drawable.p15, R.drawable.p16, R.drawable.p17, R.drawable.p18, R.drawable.p19, R.drawable.p20};
         int[] selected = {R.drawable.p1a, R.drawable.p2a, R.drawable.p3a, R.drawable.p4a, R.drawable.p5a, R.drawable.p6a, R.drawable.p7a, R.drawable.p8a, R.drawable.p9a, R.drawable.p10a, R.drawable.p11a, R.drawable.p12a, R.drawable.p13a, R.drawable.p14a, R.drawable.p15a, R.drawable.p16a, R.drawable.p17a, R.drawable.p18a, R.drawable.p19a, R.drawable.p20a};
         Bitmap[] images = new Bitmap[40];
