@@ -10,7 +10,8 @@ import androidx.annotation.NonNull;
 import java.util.ArrayList;
 
 /**
- * Draws the game ~60 times/second, handles touches, and tells the activity about score and game-over.
+ * Draws the game once per screen refresh (~60fps on a 60Hz screen, ~120fps on a 120Hz screen),
+ * handles touches, and tells the activity about score and game-over.
  */
 public class GameView extends View {
     private Board board;
@@ -114,7 +115,7 @@ public class GameView extends View {
         }
     }
 
-    // main game loop - called ~60 times/second
+    // main game loop - called once per screen refresh (60fps on 60Hz, 120fps on 120Hz)
     // each frame: update animations → draw background → draw tiles → notify activity → request next frame
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
